@@ -1,36 +1,34 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, useState, useEffect } from 'react';
 import { Menu, Transition } from '@headlessui/react';
 import { ChevronDownIcon, SearchIcon } from '@heroicons/react/solid';
-
-const elements = [1, 2, 3, 4, 5, 5, 6, 7, 8, 9, 1, 0, 34, 45];
-
-const Country = () => {
-  return (
-    <div className="flex flex-col w-60 h-80 bg-very-dark-blue">
-      <div className="flex-1">
-        <img
-          className="w-full h-auto object-cover"
-          alt="Flag of Germany"
-          src="https://img.freepik.com/premium-photo/flag-germany-3d-illustration-german-flag-waving_2227-1776.jpg?w=2000"
-        />
-      </div>
-      <div className="flex-1 px-3 py-2">
-        <h1 className="text-white font-bold text-lg my-2">Germany</h1>
-        <p className="text-white">
-          Population : <span className="text-dark-gray">81,711,000</span>
-        </p>
-        <p className="text-white">
-          Region: <span className="text-dark-gray">Europe</span>
-        </p>
-        <p className="text-white">
-          Capital: <span className="text-dark-gray">Berlin</span>
-        </p>
-      </div>
-    </div>
-  );
-};
+import { useQuery } from './hooks/useQuery';
+import { GET_COUNTRIES } from './graphql/queries/Countries';
+import Country from './Components/Country';
+import { useQueryParam, NumberParam, StringParam } from 'use-query-params';
 
 const App = () => {
+  const [countries, setCountries] = useState(null);
+  const [region, setRegion] = useQueryParam('foo', StringParam);
+  const { data, isLoading } = useQuery(GET_COUNTRIES, {
+    first: 50,
+  });
+
+  useEffect(() => {
+    if (!!data) {
+      setCountries(data?.countries?.edges);
+    }
+  }, [data]);
+
+  if (isLoading) {
+    return (
+      <div className="mx-auto mt-20 flex justify-center items-center w-full text-2xl font-bold text-white text-center">
+        Loading...
+      </div>
+    );
+  }
+
+  console.log('Re-renders');
+
   return (
     <div>
       <header className="bg-very-dark-blue p-4">
@@ -131,10 +129,11 @@ const App = () => {
             </Menu>
           </div>
         </section>
-        <section className="grid grid-rows-4 md:grid-flow-col gap-4 my-4">
-          {elements.map((element) => (
-            <Country />
-          ))}
+        <section className="grid grid-rows-4 md:grid-cols-4 gap-4 my-4">
+          {!!countries &&
+            countries.map((country, idx) => (
+              <Country key={country.node.id} data={country.node} />
+            ))}
         </section>
       </main>
     </div>
