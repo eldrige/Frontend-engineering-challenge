@@ -4,13 +4,21 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { QueryParamProvider } from 'use-query-params';
+import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client';
+
+const client = new ApolloClient({
+  uri: 'https://graphql.country/graphql',
+  cache: new InMemoryCache(),
+});
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <QueryParamProvider>
-      <App />
-    </QueryParamProvider>
+    <ApolloProvider client={client}>
+      <QueryParamProvider>
+        <App />
+      </QueryParamProvider>
+    </ApolloProvider>
   </React.StrictMode>
 );
 

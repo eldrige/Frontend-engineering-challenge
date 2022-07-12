@@ -1,17 +1,44 @@
 import React, { Fragment, useState, useEffect } from 'react';
 import { Menu, Transition } from '@headlessui/react';
 import { ChevronDownIcon, SearchIcon } from '@heroicons/react/solid';
-import { useQuery } from './hooks/useQuery';
 import { GET_COUNTRIES } from './graphql/queries/Countries';
 import Country from './Components/Country';
-import { useQueryParam, NumberParam, StringParam } from 'use-query-params';
+import { useQueryParam, StringParam } from 'use-query-params';
+import { useLazyQuery } from '@apollo/client';
 
 const App = () => {
   const [countries, setCountries] = useState(null);
-  const [region, setRegion] = useQueryParam('foo', StringParam);
-  const { data, isLoading } = useQuery(GET_COUNTRIES, {
-    first: 50,
-  });
+  const [searchedCountry, setSearchedCountry] = useState(null);
+  const [region, setRegion] = useQueryParam('region', StringParam);
+
+  const [getCountries, { loading, error, data, refetch }] = useLazyQuery(
+    GET_COUNTRIES,
+    {
+      variables: {
+        first: 50,
+        region_Icontains: region,
+        name_Icontains: searchedCountry,
+      },
+    }
+  );
+
+  const handleClickRegion = (region) => {
+    setRegion(region);
+    refetch({
+      region_Icontains: region,
+    });
+  };
+
+  const handleSearchCountry = (e) => {
+    e.preventDefault();
+    refetch({
+      name_Icontains: searchedCountry,
+    });
+  };
+
+  useEffect(() => {
+    getCountries();
+  }, []);
 
   useEffect(() => {
     if (!!data) {
@@ -19,7 +46,7 @@ const App = () => {
     }
   }, [data]);
 
-  if (isLoading) {
+  if (loading) {
     return (
       <div className="mx-auto mt-20 flex justify-center items-center w-full text-2xl font-bold text-white text-center">
         Loading...
@@ -27,25 +54,40 @@ const App = () => {
     );
   }
 
-  console.log('Re-renders');
+  if (error) {
+    return (
+      <div className="mx-auto mt-20 flex justify-center items-center w-full text-2xl font-bold text-white text-center">
+        An unexpected error occured, Please try again...
+      </div>
+    );
+  }
 
   return (
     <div>
       <header className="bg-very-dark-blue p-4">
         <div className="max-w-7xl w-full mx-auto">
-          <h1 className="text-white font-bold text-xl">Where in the world ?</h1>
+          <h1 className="text-white font-bold text-xl">
+            Where in the world ? {region}
+          </h1>
         </div>
       </header>
       <main className="mx-auto max-w-7xl w-full my-4">
         <section className="w-full flex flex-row justify-between items-center">
-          <div className="flex flex-row items-center space-x-1">
-            <SearchIcon className="text-white w-7 h-7" />
+          <form
+            onSubmit={handleSearchCountry}
+            className="flex flex-row items-center space-x-1 bg-very-dark-blue"
+          >
+            <div className="bg-very-dark-blue pl-2">
+              <SearchIcon className="text-white w-7 h-7" />
+            </div>
             <input
-              className="w-full p-1 text-white bg-very-dark-blue border-none"
+              className="w-full p-1 text-white bg-very-dark-blue border-none outline-none"
               type="text"
               placeholder="Search for a country"
+              value={searchedCountry}
+              onChange={(e) => setSearchedCountry(e.target.value)}
             />
-          </div>
+          </form>
           <div>
             <Menu as="div" className="relative inline-block text-left">
               <div>
@@ -71,6 +113,19 @@ const App = () => {
                     <Menu.Item>
                       {({ active }) => (
                         <button
+                          onClick={() => handleClickRegion(null)}
+                          className={`${
+                            active ? ' text-white' : 'text-very-light-gray'
+                          } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                        >
+                          All
+                        </button>
+                      )}
+                    </Menu.Item>
+                    <Menu.Item>
+                      {({ active }) => (
+                        <button
+                          onClick={() => handleClickRegion('Africa')}
                           className={`${
                             active ? ' text-white' : 'text-very-light-gray'
                           } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
@@ -82,6 +137,7 @@ const App = () => {
                     <Menu.Item>
                       {({ active }) => (
                         <button
+                          onClick={() => handleClickRegion('America')}
                           className={`${
                             active ? ' text-white' : 'text-very-light-gray'
                           } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
@@ -93,6 +149,7 @@ const App = () => {
                     <Menu.Item>
                       {({ active }) => (
                         <button
+                          onClick={() => handleClickRegion('Asia')}
                           className={`${
                             active ? ' text-white' : 'text-very-light-gray'
                           } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
@@ -104,6 +161,7 @@ const App = () => {
                     <Menu.Item>
                       {({ active }) => (
                         <button
+                          onClick={() => handleClickRegion('Europe')}
                           className={`${
                             active ? ' text-white' : 'text-very-light-gray'
                           } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
@@ -115,6 +173,7 @@ const App = () => {
                     <Menu.Item>
                       {({ active }) => (
                         <button
+                          onClick={() => handleClickRegion('Oceania')}
                           className={`${
                             active ? ' text-white' : 'text-very-light-gray'
                           } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
