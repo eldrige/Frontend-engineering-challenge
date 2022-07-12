@@ -31,13 +31,14 @@ const App = () => {
 
   const handleSearchCountry = (e) => {
     e.preventDefault();
-    // refetch({
-    //   name_Icontains: searchedCountry,
-    // });
+    refetch({
+      name_Icontains: searchedCountry,
+    });
   };
 
   useEffect(() => {
     getCountries();
+    //eslint-disable-next-line
   }, []);
 
   useEffect(() => {
