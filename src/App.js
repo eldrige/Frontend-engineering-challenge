@@ -15,7 +15,7 @@ const App = () => {
     GET_COUNTRIES,
     {
       variables: {
-        first: 50,
+        first: 70,
         region_Icontains: region,
         name_Icontains: searchedCountry,
       },
@@ -31,9 +31,9 @@ const App = () => {
 
   const handleSearchCountry = (e) => {
     e.preventDefault();
-    refetch({
-      name_Icontains: searchedCountry,
-    });
+    // refetch({
+    //   name_Icontains: searchedCountry,
+    // });
   };
 
   useEffect(() => {
@@ -73,7 +73,7 @@ const App = () => {
       </header>
       <main className="mx-auto max-w-7xl w-full my-4">
         <section className="w-full flex flex-row justify-between items-center">
-          <form
+          <div
             onSubmit={handleSearchCountry}
             className="flex flex-row items-center space-x-1 bg-very-dark-blue"
           >
@@ -87,7 +87,7 @@ const App = () => {
               value={searchedCountry}
               onChange={(e) => setSearchedCountry(e.target.value)}
             />
-          </form>
+          </div>
           <div>
             <Menu as="div" className="relative inline-block text-left">
               <div>
