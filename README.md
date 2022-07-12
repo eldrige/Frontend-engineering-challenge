@@ -15,6 +15,10 @@ Apollo client's API is easy to use, and supports many use cases for working with
 Tailwind provides a quick way to write css without ever leaving HTML, and it provides users with great developer experience.
 
 
-### `Country GraphQL API`****
+### `Country GraphQL API`
 
 In other to simplify the process of choosing an API, I choose the  [GraphQL Country API](https://graphql.country/graphql) because it covers both the filter and search use cases of the challenge.
+
+### `Website Preview`
+
+You can access the website directly here [Countries GQL-API](https://62ce03a678330203d7018234--tubular-truffle-f32ea4.netlify.app/), 
